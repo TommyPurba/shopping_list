@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shoping_list/home.dart';
 
 
 void main(){
@@ -10,7 +11,6 @@ class MyApp extends StatelessWidget{
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return MaterialApp(
       title: "flutter Groceries",
       theme: ThemeData.dark().copyWith(
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget{
         ),
         scaffoldBackgroundColor: const Color.fromARGB(255, 50, 58, 60),
       ),
-      home: ...,
+      home: Home(),
     );
 
   }
