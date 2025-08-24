@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shoping_list/data/dummy_items.dart';
+//tidak dipakai lagi karena sudah ada kondisi kalau kosong string munculPlease add item, there is no item
+// import 'package:shoping_list/data/dummy_items.dart';
+import 'package:shoping_list/models/grocey_item.dart';
 import 'package:shoping_list/widgets/new_item.dart';
 
 class GroceryList extends StatefulWidget{
@@ -10,14 +12,82 @@ class GroceryList extends StatefulWidget{
 }
 
 class _GroceryListState extends State<GroceryList> {
-  void _addButton(){
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => NewItem(),
-    ),
+  final List<GroceryItem> _groceryItems = [];
+
+
+  void _addButton() async {
+    final newItems = await Navigator.of(context).push<GroceryItem>(
+      MaterialPageRoute(builder: (ctx) => NewItem(),
+     ),
     );
+    setState(() {
+      if(newItems == null){
+        return ;
+      }
+      _groceryItems.add(newItems);
+    });
   }
 
+  void _remmoveItem(GroceryItem groceryItem){
+      final groceryIndex = _groceryItems.indexOf(groceryItem);
+
+      setState(() {
+        _groceryItems.remove(groceryItem);
+      });
+
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 3),
+          content: const Text("Item deleted.", style: TextStyle( 
+            color: Colors.blue,
+          ),),
+          action: SnackBarAction(
+            label: "Undo",
+            onPressed: (){
+              setState(() {
+                  _groceryItems.insert(groceryIndex, groceryItem);
+              });
+            }
+          ),
+        )
+      );
+
+  }
+
+  
+ 
   @override
   Widget build(BuildContext context) {
+     Widget mainContext = Center(child: Text('No Items found. Starting adding some !'),);
+
+  if(_groceryItems.isNotEmpty){
+    mainContext = ListView.builder(
+        itemCount: _groceryItems.length,
+        itemBuilder: (ctx, index) =>  Dismissible(
+          key: ValueKey(_groceryItems[index]),
+          background: Container(
+            color: Colors.redAccent,
+            margin: EdgeInsets.symmetric(horizontal: 16),
+          ),
+          child: ListTile(
+            leading: Container(
+              width: 24,
+              height: 24,
+              color: _groceryItems[index].category.color,
+            ),
+            title: Text(_groceryItems[index].name),
+            trailing: Text(_groceryItems[index].quantity.toString()),
+          ),
+          onDismissed: (direction){
+            setState(() {
+              _remmoveItem(_groceryItems[index]);
+            });
+          },
+        ),
+      );
+  }
+
     
     return Scaffold(
       appBar: AppBar(
@@ -27,18 +97,7 @@ class _GroceryListState extends State<GroceryList> {
         ],
       ),
       //best choise build
-      body: ListView.builder(
-        itemCount: groceryItems.length,
-        itemBuilder: (ctx, index) =>  ListTile(
-          leading: Container(
-            width: 24,
-            height: 24,
-            color: groceryItems[index].category.color,
-          ),
-          title: Text(groceryItems[index].name),
-          trailing: Text(groceryItems[index].quantity.toString()),
-        )
-      )
+      body: mainContext
       //another choice
       // Column(
       //   children: [
