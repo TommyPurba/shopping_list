@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shoping_list/data/categories.dart';
 import 'package:shoping_list/models/category.dart';
 import 'package:shoping_list/models/grocey_item.dart';
+// import 'package:shoping_list/models/grocey_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -19,14 +20,16 @@ class _NewItemState extends State<NewItem>{
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
 
-  void _saveItem (){
+  void _saveItem () async{
     if(_formKey.currentState!.validate()){
       _formKey.currentState!.save();
+      //post to database firebase
+      
       final url = Uri.https('flutterprep-23dd5-default-rtdb.firebaseio.com', 'shoping-list.json');
-      http.post(
+      final response = await http.post(
         url,
       headers: {
-       'Content-Type': "aplication/json"
+       'Content-Type': "application/json"
         },
       body: json.encode(
         {
@@ -36,13 +39,30 @@ class _NewItemState extends State<NewItem>{
         }
       )
       );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      print(response.body);
+      print(response.body);
+
+      if(!context.mounted){
+        return;
+      }
+
+      Navigator.of(context).pop(
+        GroceryItem(
+                  id: DateTime.now().toString(),
+         name: _enteredName,
+          quantity: _enteredQuantity, 
+          category: _selectedCategory!
+        )
+      );
       // tidak dipakai karena sudah pakai API
       // Navigator.of(context).pop(GroceryItem(
       //   //pakai datetime dulu tapi ini tidak bagus ya tom
-      //   id: DateTime.now().toString(),
-      //    name: _enteredName,
-      //     quantity: _enteredQuantity, 
-      //     category: _selectedCategory!
+        // id: DateTime.now().toString(),
+        //  name: _enteredName,
+        //   quantity: _enteredQuantity, 
+        //   category: _selectedCategory!
       // )
       // );
     }
