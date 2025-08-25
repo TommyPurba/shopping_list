@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shoping_list/data/categories.dart';
 import 'package:shoping_list/models/category.dart';
 import 'package:shoping_list/models/grocey_item.dart';
@@ -12,22 +15,36 @@ class NewItem extends StatefulWidget {
 }
 class _NewItemState extends State<NewItem>{
   final _formKey = GlobalKey<FormState>();
-
   var _enteredName = "";
   var _enteredQuantity = 1;
-  var _selectedCategory = categories[Categories.vegetables];
+  var _selectedCategory = categories[Categories.vegetables]!;
 
   void _saveItem (){
     if(_formKey.currentState!.validate()){
       _formKey.currentState!.save();
-      Navigator.of(context).pop(GroceryItem(
-        //pakai datetime dulu tapi ini tidak bagus ya tom
-        id: DateTime.now().toString(),
-         name: _enteredName,
-          quantity: _enteredQuantity, 
-          category: _selectedCategory!
+      final url = Uri.https('flutterprep-23dd5-default-rtdb.firebaseio.com', 'shoping-list.json');
+      http.post(
+        url,
+      headers: {
+       'Content-Type': "aplication/json"
+        },
+      body: json.encode(
+        {
+           'name': _enteredName,
+          'quantity': _enteredQuantity, 
+          'category': _selectedCategory.title,
+        }
       )
       );
+      // tidak dipakai karena sudah pakai API
+      // Navigator.of(context).pop(GroceryItem(
+      //   //pakai datetime dulu tapi ini tidak bagus ya tom
+      //   id: DateTime.now().toString(),
+      //    name: _enteredName,
+      //     quantity: _enteredQuantity, 
+      //     category: _selectedCategory!
+      // )
+      // );
     }
     
   }
@@ -107,7 +124,7 @@ class _NewItemState extends State<NewItem>{
                           ], 
                           onChanged: (value){
                             setState(() {
-                              _selectedCategory =value;
+                              _selectedCategory =value!;
                             });
                           }
                         
