@@ -41,8 +41,8 @@ class _NewItemState extends State<NewItem>{
       );
 
       final Map<String, dynamic> resData = json.decode(response.body);
-      print(response.body);
-      print(response.body);
+      // print(response.body);
+      // print(response.body);
 
       if(!context.mounted){
         return;
@@ -50,10 +50,10 @@ class _NewItemState extends State<NewItem>{
 
       Navigator.of(context).pop(
         GroceryItem(
-                  id: DateTime.now().toString(),
+                  id: resData['name'],
          name: _enteredName,
           quantity: _enteredQuantity, 
-          category: _selectedCategory!
+          category: _selectedCategory
         )
       );
       // tidak dipakai karena sudah pakai API
