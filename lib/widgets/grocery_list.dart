@@ -29,7 +29,9 @@ class _GroceryListState extends State<GroceryList> {
   }
 
   void _loadItem() async{
-    final url = Uri.https(
+
+    try {
+      final url = Uri.https(
       'flutterprep-23dd5-default-rtdb.firebaseio.com', 'shoping-list.json'
     );
 
@@ -61,6 +63,13 @@ class _GroceryListState extends State<GroceryList> {
       _groceryItems = loadedItems;
       _isLoading = false;
     });
+      
+    } catch (e) {
+      setState(() {
+         'Something went wrong. Please try again later';
+      });
+    }
+    
   }
 
   void _addButton() async {
