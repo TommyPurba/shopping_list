@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shoping_list/data/categories.dart';
-import 'package:shoping_list/data/dummy_items.dart';
+// import 'package:shoping_list/data/dummy_items.dart';
 //tidak dipakai lagi karena sudah ada kondisi kalau kosong string munculPlease add item, there is no item
 // import 'package:shoping_list/data/dummy_items.dart';
 import 'package:shoping_list/models/grocey_item.dart';
@@ -18,7 +18,7 @@ class GroceryList extends StatefulWidget{
 
 class _GroceryListState extends State<GroceryList> {
    List<GroceryItem> _groceryItems = [];
-
+  var _isLoading = true;
 
   @override
   void initState() {
@@ -41,7 +41,8 @@ class _GroceryListState extends State<GroceryList> {
     }
 
     setState(() {
-      _groceryItems = [...loadedItems];
+      _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
@@ -92,6 +93,10 @@ class _GroceryListState extends State<GroceryList> {
   @override
   Widget build(BuildContext context) {
      Widget mainContext = Center(child: Text('No Items found. Starting adding some !'),);
+    
+    if(_isLoading){
+      mainContext = const Center(child: CircularProgressIndicator(),);
+    }
 
   if(_groceryItems.isNotEmpty){
     mainContext = ListView.builder(
