@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shoping_list/data/categories.dart';
+import 'package:shoping_list/data/dummy_items.dart';
 // import 'package:shoping_list/data/dummy_items.dart';
 //tidak dipakai lagi karena sudah ada kondisi kalau kosong string munculPlease add item, there is no item
 // import 'package:shoping_list/data/dummy_items.dart';
@@ -34,7 +35,7 @@ class _GroceryListState extends State<GroceryList> {
 
     final response = await http.get(url);
 
-    if(response.statusCode>400){
+    if(response.statusCode>=400){
       setState(() {
         _error = 'Failed to fetch data. Please try again later';
       });
@@ -71,12 +72,26 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
-  void _remmoveItem(GroceryItem groceryItem){
+  void _remmoveItem(GroceryItem groceryItem) async{
       final groceryIndex = _groceryItems.indexOf(groceryItem);
 
       setState(() {
         _groceryItems.remove(groceryItem);
       });
+
+
+
+       final url = Uri.https(
+      'flutterprep-23dd5-default-rtdb.firebaseio.com', 'shoping-list/${groceryItem.id}.json'
+    );
+
+      final response = await http.delete(url);
+
+      if(response.statusCode >=400){
+        setState(() {
+          _groceryItems.insert(groceryIndex, groceryItem);
+        });
+      }
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,10 +102,22 @@ class _GroceryListState extends State<GroceryList> {
           ),),
           action: SnackBarAction(
             label: "Undo",
-            onPressed: (){
+            onPressed: () async{
               setState(() {
                   _groceryItems.insert(groceryIndex, groceryItem);
               });
+
+              final url =Uri.https('flutterprep-23dd5-default-rtdb.firebaseio.com',
+      'shoping-list/${groceryItem.id}.json',);
+              await http.put(
+                url,
+                headers: {'Content-type' : 'application/json'},
+                body: json.encode({
+                  'name' : groceryItem.name,
+                  'quantity' : groceryItem.quantity,
+                  'category' : groceryItem.category.title,
+                }),
+              );
             }
           ),
         )
