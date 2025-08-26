@@ -48,10 +48,34 @@
         final Map<String, dynamic> resData = json.decode(response.body);
         // print(response.body);
         // print(response.body);
-
-        if(!context.mounted){
-          return;
-        }
+        // setelah dapat resData dari Firebase
+        
+        // ganti bagian ini:
+        
+        // if(!context.mounted){
+        //   return;
+        // }
+        
+        // Navigator.of(context).pop(
+        //   GroceryItem(
+        //     id: resData['name'],
+        //     name: _enteredName,
+        //     quantity: _enteredQuantity, 
+        //     category: _selectedCategory
+        //   ),
+        // );
+        
+        // menjadi seperti ini:
+        
+        // Pastikan widget ini masih aktif / mounted (supaya tidak error setState setelah dispose)
+        if (!mounted) return;
+        
+        // (Opsional) pastikan Navigator masih bisa pop (aman kalau page ini root)
+        if (!Navigator.of(context).canPop()) return;
+        
+        // Pop halaman ini, sekaligus kirim kembali data GroceryItem ke halaman sebelumnya
+        
+        
 
         Navigator.of(context).pop(
           GroceryItem(
